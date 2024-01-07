@@ -1,76 +1,71 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// ItemController.cs
+using Microsoft.AspNetCore.Mvc;
 using Mini_Sonic.Model;
 using Mini_Sonic.Service;
+using Mini_Sonic_DAL.Contacts;
+using System;
+using System.Collections.Generic;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace Mini_Sonic.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class ItemController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ItemController : ControllerBase
+    private readonly ItemService _itemService;
+
+    public ItemController(IRepository<Item> itemRepository)
     {
-        private readonly ItemService _serviceItem;
+        _itemService = new ItemService(itemRepository);
+    }
 
-        public ItemController(ItemService serviceItem)
+    [HttpGet]
+    public IEnumerable<Item> Get()
+    {
+        return _itemService.GetAll();
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Item> Get(int id)
+    {
+        var item = _itemService.GetById(id);
+        if (item == null)
         {
-            _serviceItem = serviceItem;
-            
+            return NotFound();
         }
-        // GET: api/<ItemController>
-        [HttpGet]
-        public IEnumerable<Item> Get()
+        return Ok(item);
+    }
+
+    [HttpPost]
+    public ActionResult<Item> Post(Item item)
+    {
+        var newItem = _itemService.Add(item);
+        return CreatedAtAction(nameof(Get), new { id = newItem.Id }, newItem);
+    }
+
+    [HttpPut]
+    public ActionResult<Item> Put(Item item)
+    {
+        try
         {
-            var items = _serviceItem.GetAllItems();
-            return items;
+            var updatedItem = _itemService.Update(item);
+            return Ok(updatedItem);
         }
-
-        // GET api/<ItemController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        // POST api/<ItemController>
-        [HttpPost]
-        public Item Post(Item item)
+        catch (Exception ex)
         {
-            var newItem = _serviceItem.AddItem(item);
-            return newItem;
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
         }
+    }
 
-        [HttpPut("{id}")]
-        public ActionResult<Item> Put(int id, [FromBody] Item item)
+    [HttpDelete("{id}")]
+    public ActionResult<int> Delete(int id)
+    {
+        try
         {
-            try
-            {
-                // Assuming you set the Id of the item to be updated
-                item.Id = id;
-
-                var updatedItem = _serviceItem.UpdateItem(item);
-                return Ok(updatedItem);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it accordingly
-                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-            }
+            _itemService.Delete(id);
+            return Ok(id);
         }
-
-        // DELETE api/<ItemController>/5
-        [HttpDelete("{id}")]
-        public ActionResult<int> Delete(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                _serviceItem.DeleteItem(id);
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-            }
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
         }
     }
 }

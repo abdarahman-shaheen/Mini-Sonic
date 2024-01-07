@@ -3,6 +3,11 @@ using Microsoft.Data.SqlClient;
 using Mini_Sonic.Service;
 using System.Data;
 using Mini_Sonic.Controllers;
+using Mini_Sonic.Model;
+using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Repositories;
+using Microsoft.OpenApi.Models;
+using System.Configuration;
 
 namespace Mini_Sonic
 {
@@ -11,15 +16,34 @@ namespace Mini_Sonic
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddTransient<CategoryService>();
-            builder.Services.AddTransient<ItemService>();
+       
+            //builder.Services.AddTransient<UserManager>();
+            //builder.Services.AddTransient<UserService>();
 
-            //Console.ReadKey();
+            //builder.Services.AddTransient<CategoryManager>();
+            //builder.Services.AddTransient<CategoryService>();
+            builder.Services.AddTransient(typeof(IRepository<>), typeof(GenericRepositry<>));
+            //builder.Services.AddTransient<ItemService>();
+            //builder.Services.AddTransient<ItemManager>();
+
+            //builder.Services.AddTransient<OperationManager>();
+            //builder.Services.AddTransient<OperationService>();
+
+
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
+
             builder.Services.AddEndpointsApiExplorer();
+
+
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sonic", Version = "v1" });
+            });
+
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
@@ -38,7 +62,10 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sonic v1");
+                });
             }
 
             app.UseHttpsRedirection();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Mini_Sonic.Model;
 using Mini_Sonic.Service;
+using Mini_Sonic_DAL.Contacts;
 using System.Reflection.Metadata.Ecma335;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,62 +14,55 @@ namespace Mini_Sonic.Controllers
     {
         private readonly CategoryService _categoryService;
 
-        // Inject CategoryService through constructor
-        public CategoryController(CategoryService categoryService)
+        public CategoryController(IRepository<Categoty> categoryRepository)
         {
-            _categoryService = categoryService;
+            _categoryService = new CategoryService(categoryRepository);
         }
 
-        // GET: api/<CategoryController>
         [HttpGet]
-        public ActionResult<List<Category>> Get()
+        public IEnumerable<Categoty> Get()
         {
-            var categories = _categoryService.GetAllCategories();
-
-            return Ok(categories);
+            return _categoryService.GetAll();
         }
 
-        // POST api/<CategoryController>
+        [HttpGet("{id}")]
+        public ActionResult<Categoty> Get(int id)
+        {
+            var category = _categoryService.GetById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
+        }
+
         [HttpPost]
-        public ActionResult<string> Post(Category category)
+        public ActionResult<Categoty> Post(Categoty category)
+        {
+            var newCategory = _categoryService.Add(category);
+            return Ok( newCategory);
+        }
+
+        [HttpPut]
+        public ActionResult<Categoty> Put(Categoty category)
         {
             try
             {
-                var categorys = _categoryService.AddCategory(category);
-
-                return Ok(categorys);
-
+                var updatedCategory = _categoryService.Update(category);
+                return Ok(updatedCategory);
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
 
-        // PUT api/<CategoryController>/5
-        [HttpPut()]
-        public ActionResult<string> Put(Category category)
-        {
-            try
-            {
-                var categoryupdate = _categoryService.UpdateCategory(category);
-                return Ok(categoryupdate);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it accordingly
-                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-            }
-        }
-
-        // DELETE api/<CategoryController>/5
         [HttpDelete("{id}")]
-        public ActionResult<string> Delete(int id)
+        public ActionResult<int> Delete(int id)
         {
             try
             {
-                _categoryService.DeleteCategory(id);
+                _categoryService.Delete(id);
                 return Ok(id);
             }
             catch (Exception ex)
@@ -78,3 +72,4 @@ namespace Mini_Sonic.Controllers
         }
     }
 }
+
