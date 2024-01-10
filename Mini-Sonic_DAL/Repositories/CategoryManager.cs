@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,12 +22,22 @@ namespace Mini_Sonic_DAL.Repositories
             _categoryRepository = categoryRepository;
         }
 
-        public Categoty Add(Categoty entity)
+
+        public OperationResult Add(Categoty entity)
         {
             var sql = "INSERT INTO Categoty (CategoryName) VALUES (@CategoryName); SELECT CAST(SCOPE_IDENTITY() AS INT)";
-            return _categoryRepository.Add(entity, sql);
+            var newId = _categoryRepository.Add(entity, sql);
+
+            return newId != null ? OperationResult.Success : OperationResult.Fail;
         }
 
+        public OperationResult Update(Categoty entity)
+        {
+            var sql = "UPDATE Categoty SET CategoryName = @CategoryName WHERE Id = @Id";
+            _categoryRepository.Update(entity, sql);
+
+            return OperationResult.Success;
+        }
         public void Delete(int id)
         {
             var sql = "DELETE FROM Categoty WHERE Id = @Id";
@@ -50,12 +61,9 @@ namespace Mini_Sonic_DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Categoty Update(Categoty entity)
+        public OperationResult Add(Operation entity, string connectionString)
         {
-            var sql = "UPDATE Categoty SET CategoryName = @CategoryName WHERE Id = @Id";
-
-            _categoryRepository.Update(entity, sql);
-            return entity;
+            throw new NotImplementedException();
         }
     }
 }

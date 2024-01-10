@@ -10,6 +10,7 @@ namespace Mini_Sonic.Model
         public int Tax { get; set; }
         public int CategoryId { get; set; }
         public int Quantity { get; set; }
+
     }
 }
 

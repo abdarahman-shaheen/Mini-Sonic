@@ -1,4 +1,6 @@
-﻿using Mini_Sonic.Model;
+﻿using Microsoft.Data.SqlClient;
+using Mini_Sonic.Model;
+using Mini_Sonic_DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +13,8 @@ namespace Mini_Sonic_DAL.Contacts
     {
         T GetById(int id);
         List<T> GetAll();
-        T Add(T entity);
-        T Update(T entity);
+        OperationResult Add(T entity);
+        OperationResult Update(T entity);
         void Delete(int id);
 
         public List<Item> GetOperationDetailsByOperationId(int operationId);
@@ -20,13 +22,17 @@ namespace Mini_Sonic_DAL.Contacts
     }
     public interface IRepository<T> where T : class
     {
-        T GetById(int id,string sql);
+        T GetById(int id, string sql);
 
         List<T> GetAll(string sql);
         T Add(T entity, string sql);
-        T Update(T entity, string sql);
+        T Add(T entity, string sql, SqlTransaction transaction);
+        OperationResult Update(T entity, string sql);
         void Delete(int id, string sql);
-        List<Item> GetOperationDetailsByOperationId(int operationId,string sql);
-        public Operation AddOperationWithDetails(Operation entity);
+        List<Item> GetOperationDetailsByOperationId(int operationId, string sql);
+        public OperationResult AddOperationWithDetails(List<OperationDetail> entity, string sqlOperation, int operationId);
+        OperationResult AddOperationWithDetails(List<OperationDetail> entitylistDetails, string sqlOperationDetails, int operationId, SqlTransaction transaction);
+
+
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
 using System.Data;
 
@@ -21,7 +22,7 @@ namespace Mini_Sonic.Service
             return _userManager.GetAll();
         }
 
-        public User Add(User entity)
+        public OperationResult Add(User entity)
         {
             throw new NotImplementedException();
         }
@@ -42,7 +43,12 @@ namespace Mini_Sonic.Service
             throw new NotImplementedException();
         }
 
-        public User Update(User entity)
+        public OperationResult Update(User entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }

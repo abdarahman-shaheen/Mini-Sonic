@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
 using System.Data;
 using System.Data.Common;
@@ -17,11 +18,37 @@ namespace Mini_Sonic.Service
             _categoryManager = new CategoryManager(categoryRepository);
         }
 
-        public Categoty Add(Categoty entity)
+        public OperationResult Add(Categoty entity)
         {
-            return _categoryManager.Add(entity);
+            var Result = _categoryManager.Add(entity);
+            if (Result != null)
+            {
+                // If operation was successful, return the entity
+                return  OperationResult.Success;
+            }
+            else
+            {
+                // If operation failed, you might want to handle it accordingly
+                return OperationResult.Fail;
+            }
         }
 
+    
+        public OperationResult Update(Categoty entity)
+        {
+            var Result = _categoryManager.Update(entity);
+            if (Result == OperationResult.Success)
+            {
+                // If operation was successful, return the entity
+                return OperationResult.Success;
+            }
+            else
+            {
+                // If operation failed, you might want to handle it accordingly
+                // For now, let's return null, but you can modify this based on your needs
+                return OperationResult.Fail;
+            }
+        }
         public void Delete(int id)
         {
             _categoryManager.Delete(id);
@@ -42,9 +69,9 @@ namespace Mini_Sonic.Service
             throw new NotImplementedException();
         }
 
-        public Categoty Update(Categoty entity)
+        public OperationResult Add(Operation entity, string connectionString)
         {
-            return _categoryManager.Update(entity);
+            throw new NotImplementedException();
         }
     }
 }

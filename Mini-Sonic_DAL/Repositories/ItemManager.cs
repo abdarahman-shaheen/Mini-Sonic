@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using System.Data;
 namespace Mini_Sonic_DAL.Repositories
 {
@@ -15,18 +16,20 @@ namespace Mini_Sonic_DAL.Repositories
             _itemRepository = itemRepository;
         }
 
-        public Item Add(Item entity)
+
+        public OperationResult Add(Item entity)
         {
             string sql = @"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
                       VALUES(@Name, @Price, @Discount, @Tax, @CategoryId)" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
-             sql = $@"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
-                      VALUES({entity.Name}, @Price, @Discount, @Tax, @CategoryId)" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
+            var result = _itemRepository.Add(entity, sql);
 
-            sql = $@"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
-                      VALUES({entity.Name}, @Price, @Discount, @Tax, @CategoryId)" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
+            return result != null ? OperationResult.Success : OperationResult.Fail;
+        }
 
-            return _itemRepository.Add(entity, sql);
+        public OperationResult Add(Operation entity, string connectionString)
+        {
+            throw new NotImplementedException();
         }
 
         public void Delete(int id)
@@ -52,14 +55,15 @@ namespace Mini_Sonic_DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Item Update(Item entity)
+
+        public OperationResult Update(Item entity)
         {
             var sql = "UPDATE Item " +
                       "SET Name = @Name, Price = @Price, Discount = @Discount, Tax = @Tax, CategoryId = @CategoryId " +
                       "WHERE Id = @Id";
 
             _itemRepository.Update(entity, sql);
-            return entity;
+            return OperationResult.Success;
         }
     }
 }

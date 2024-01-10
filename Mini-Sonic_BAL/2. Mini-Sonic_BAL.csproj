@@ -9,8 +9,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mini-Sonic_DAL\3. Mini-Sonic_DAL.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.14" />
 	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
   </ItemGroup>
 
 </Project>

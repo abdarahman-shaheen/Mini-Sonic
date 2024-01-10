@@ -8,6 +8,9 @@ using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Repositories;
 using Microsoft.OpenApi.Models;
 using System.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Mini_Sonic
 {
@@ -16,7 +19,8 @@ namespace Mini_Sonic
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-       
+            ;
+            var jwtSettings = builder.Configuration.GetSection("JWT");
             //builder.Services.AddTransient<UserManager>();
             //builder.Services.AddTransient<UserService>();
 
@@ -28,7 +32,21 @@ namespace Mini_Sonic
 
             //builder.Services.AddTransient<OperationManager>();
             //builder.Services.AddTransient<OperationService>();
-
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]))
+    };
+});
 
 
             builder.Services.AddControllers();
@@ -41,7 +59,28 @@ namespace Mini_Sonic
             builder.Services.AddSwaggerGen();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sonic", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "JWT Authentication",
+                    Description = "Enter your JWT token",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { securityScheme, new List<string>() }
+            });
             });
 
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -70,6 +109,7 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseCors("AllowAngular");

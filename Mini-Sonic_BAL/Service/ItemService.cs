@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
 using System.Data;
 namespace Mini_Sonic.Service
@@ -17,9 +18,20 @@ namespace Mini_Sonic.Service
             _itemManager = new ItemManager(itemRepository);
         }
 
-        public Item Add(Item entity)
+        public OperationResult Add(Item entity)
         {
-            return _itemManager.Add(entity);
+            var Result=   _itemManager.Add(entity);
+            if (Result == OperationResult.Success)
+            {
+                // If operation was successful, return the entity
+                return OperationResult.Success;
+            }
+            else
+            {
+                // If operation failed, you might want to handle it accordingly
+                // For now, let's return null, but you can modify this based on your needs
+                return OperationResult.Fail;
+            }
         }
 
         public void Delete(int id)
@@ -42,9 +54,20 @@ namespace Mini_Sonic.Service
             throw new NotImplementedException();
         }
 
-        public Item Update(Item entity)
+        public OperationResult Update(Item entity)
         {
-            return _itemManager.Update(entity);
+            var Result = _itemManager.Update(entity);
+            if (Result == OperationResult.Success)
+            {
+                // If operation was successful, return the entity
+                return OperationResult.Success;
+            }
+            else
+            {
+                // If operation failed, you might want to handle it accordingly
+                // For now, let's return null, but you can modify this based on your needs
+                return OperationResult.Fail;
+            }
         }
     }
 }

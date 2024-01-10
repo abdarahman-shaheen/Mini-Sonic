@@ -1,11 +1,13 @@
 ﻿// ItemController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mini_Sonic.Model;
 using Mini_Sonic.Service;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using System;
 using System.Collections.Generic;
-
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class ItemController : ControllerBase
@@ -37,8 +39,16 @@ public class ItemController : ControllerBase
     [HttpPost]
     public ActionResult<Item> Post(Item item)
     {
-        var newItem = _itemService.Add(item);
-        return CreatedAtAction(nameof(Get), new { id = newItem.Id }, newItem);
+        var result = _itemService.Add(item);
+
+        if (result == OperationResult.Success)
+        {
+            return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
+        }
+        else
+        {
+            return StatusCode(500, new { message = "Internal server error", error = "Failed to add item" });
+        }
     }
 
     [HttpPut]
@@ -46,8 +56,16 @@ public class ItemController : ControllerBase
     {
         try
         {
-            var updatedItem = _itemService.Update(item);
-            return Ok(updatedItem);
+            var result = _itemService.Update(item);
+
+            if (result == OperationResult.Success)
+            {
+                return Ok(item);
+            }
+            else
+            {
+                return StatusCode(500, new { message = "Internal server error", error = "Failed to update item" });
+            }
         }
         catch (Exception ex)
         {

@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Mini_Sonic.Model;
 using Mini_Sonic.Service;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 using System.Reflection.Metadata.Ecma335;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mini_Sonic.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase
@@ -49,6 +52,7 @@ namespace Mini_Sonic.Controllers
             try
             {
                 var updatedCategory = _categoryService.Update(category);
+                updatedCategory = (OperationResult)1;
                 return Ok(updatedCategory);
             }
             catch (Exception ex)

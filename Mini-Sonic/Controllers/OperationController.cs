@@ -1,22 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Mini_Sonic.DTO;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Mini_Sonic.Model;
 using Mini_Sonic.Service;
 using Mini_Sonic_DAL.Contacts;
+using Mini_Sonic_DAL.Model;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mini_Sonic.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class OperationController : ControllerBase
     {
+
+
         private readonly OperationService _operationService;
+        private readonly string _connectionString = "Server=JO-SHAHEEN-PC\\SQLEXPRESS;Database=miniSonic;Integrated Security=SSPI;TrustServerCertificate=True";
 
         public OperationController(IRepository<Operation> operationRepository)
         {
             _operationService = new OperationService(operationRepository);
+           
         }
 
         [HttpGet]
@@ -26,7 +32,7 @@ namespace Mini_Sonic.Controllers
         }
 
         [HttpGet("details/{operationId}")]
-        public ActionResult<IEnumerable<OperationDetailDTO>> GetOperationDetails(int operationId)
+        public ActionResult<IEnumerable<Item>> GetOperationDetails(int operationId)
         {
             try
             {
@@ -39,14 +45,13 @@ namespace Mini_Sonic.Controllers
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
-
         [HttpPost]
-        public ActionResult<Operation> Post(Operation operation)
+        public ActionResult<OperationResult> Post(Operation operation)
         {
             try
             {
-                var newOperation = _operationService.Add(operation);
-                return Ok(newOperation);
+                var result = _operationService.Add(operation, _connectionString);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -56,15 +61,16 @@ namespace Mini_Sonic.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Operation> Put(int id, Operation operation)
+        public ActionResult<OperationResult> Put(int id, Operation operation)
         {
             try
             {
                 // Assuming you set the Id of the operation to be updated
                 operation.Id = id;
 
-                var updatedOperation = _operationService.Update(operation);
-                return Ok(updatedOperation);
+                var result = _operationService.Update(operation);
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -73,7 +79,7 @@ namespace Mini_Sonic.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+            [HttpDelete("{id}")]
         public ActionResult<int> Delete(int id)
         {
             try
