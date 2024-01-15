@@ -9,7 +9,7 @@ using Mini_Sonic_DAL.Model;
 
 namespace Mini_Sonic.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OperationController : ControllerBase
@@ -46,11 +46,11 @@ namespace Mini_Sonic.Controllers
             }
         }
         [HttpPost]
-        public ActionResult<OperationResult> Post(Operation operation)
+        public ActionResult<Result> Post(Operation operation)
         {
             try
             {
-                var result = _operationService.Add(operation, _connectionString);
+                var result = _operationService.Add(operation);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -61,7 +61,7 @@ namespace Mini_Sonic.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<OperationResult> Put(int id, Operation operation)
+        public ActionResult<Result> Put(int id, Operation operation)
         {
             try
             {

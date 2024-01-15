@@ -25,58 +25,64 @@ namespace Mini_Sonic_DAL.Repositories
             _operationRepository = operationRepository;
         }
 
-        public OperationResult Add(Operation entity)
+        public Result Add(Operation entity, DbManager dbManager)
         {
-            try
-            {
-                var sqlOperation = "INSERT INTO Operation (Date, NetTotal, GrossTotal, DiscountTotal, TaxTotal, TypeOperationId)" +
-                                   "VALUES(@Date, @NetTotal, @GrossTotal, @DiscountTotal, @TaxTotal, @TypeOperationId)" +
-                                   "SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
-                var sqlOperationDetails = "INSERT INTO OperationDetail (Quantity, ItemId, OperationId) " +
-                                        "VALUES(@Quantity, @ItemId, @OperationId);";
-
-                var operationId = _operationRepository.Add(entity, sqlOperation);
-
-                _operationRepository.AddOperationWithDetails(entity.Items, sqlOperationDetails, operationId.Id);
-
-                return OperationResult.Success;
-            }
-            catch
-            {
-                return OperationResult.Fail;
-            }
-        }
-        public OperationResult Add(Operation entity, SqlTransaction transaction)
-        {
-           
-                var sqlOperation = "INSERT INTO Operation (Date, NetTotal, GrossTotal, DiscountTotal, TaxTotal, TypeOperationId)" +
-                                    "VALUES(@Date, @NetTotal, @GrossTotal, @DiscountTotal, @TaxTotal, @TypeOperationId)" +
-                                    "SELECT CAST(SCOPE_IDENTITY() AS INT)";
-
-                var sqlOperationDetails = "INSERT INTO OperationDetail (Quantity, ItemId, OperationId) " +
-                                          "VALUES(@Quantity, @ItemId, @OperationId);";
-
-                var operationId = _operationRepository.Add(entity, sqlOperation, transaction);
-
-                _operationRepository.AddOperationWithDetails(entity.Items, sqlOperationDetails, operationId.Id, transaction);
-
-                return OperationResult.Success;
-            
           
-            
-        }
+                var sqlOperation = $@"INSERT INTO Operation (Date, NetTotal, GrossTotal, DiscountTotal, TaxTotal, TypeOperationId)
+                                   VALUES(@Date, @netTotal, @GrossTotal, @DiscountTotal, @TaxTotal, @TypeOperationId)
+                                  SELECT CAST(SCOPE_IDENTITY() AS INT)";
+            int id = -1;
+            var operationResult = _operationRepository.Add(entity, sqlOperation, ref id,dbManager); ; ;
+            entity.Id = id;
 
-        public void Delete(int id)
+            if (operationResult == Result.Success)
+            {
+
+                return Result.Success;
+            }
+            else
+            {
+                return Result.Fail;
+            }
+
+        }
+        public Result AddDetails(List<OperationDetail>entity, DbManager dbManager,int OperationId)
+
+        {
+            var operationResult = Result.Success;
+            foreach (var item in entity)
+            {
+                string sqlOperationDetails = $@"INSERT INTO OperationDetail (Quantity, ItemId, OperationId)  
+                                        VALUES({item.Quantity},{item.ItemId},{OperationId});";
+
+              operationResult  = _operationRepository.Add(sqlOperationDetails, dbManager);
+
+            }
+            if (operationResult == Result.Success)
+            {
+
+                return Result.Success;
+            }
+            else
+            {
+                return Result.Fail;
+            }
+
+        }
+     
+
+        public Result Delete(int id)
         {
             try
             {
                 var sql = "DELETE FROM Operation WHERE Id = @Id";
                 _operationRepository.Delete(id, sql);
+                return Result.Success;
             }
             catch
             {
-                // Log or handle the exception as needed
+                return Result.Fail;
             }
         }
 
@@ -89,7 +95,6 @@ namespace Mini_Sonic_DAL.Repositories
             }
             catch
             {
-                // Log or handle the exception as needed
                 return new List<Operation>();
             }
         }
@@ -103,12 +108,11 @@ namespace Mini_Sonic_DAL.Repositories
             }
             catch
             {
-                // Log or handle the exception as needed
                 return null;
             }
         }
 
-        public OperationResult Update(Operation entity)
+        public Result Update(Operation entity)
         {
             try
             {
@@ -119,11 +123,11 @@ namespace Mini_Sonic_DAL.Repositories
 
                 _operationRepository.Update(entity, sql);
 
-                return OperationResult.Success;
+                return Result.Success;
             }
             catch
             {
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
 
@@ -152,6 +156,11 @@ namespace Mini_Sonic_DAL.Repositories
                 // Log or handle the exception as needed
                 return new List<Item>();
             }
+        }
+
+        public Result Add(Operation entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

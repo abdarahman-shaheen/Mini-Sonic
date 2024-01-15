@@ -28,22 +28,29 @@ namespace Mini_Sonic_DAL.Repositories
             var sql = "SELECT * FROM UserSonic";
             return _userRepository.GetAll(sql);
         }
-        public OperationResult Add(User entity)
+        public Result Add(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(int id)
+        public Result Delete(int id)
         {
             throw new NotImplementedException();
 
 
-          
+
         }
         public User GetById(int id)
         {
-            throw new NotImplementedException();
+            var sql = "SELECT * from UserSonic where Id=@Id";
+            return _userRepository.GetById(id, sql);
         }
+        public User GetUser(string email,string password)
+        {
+            var sql = "SELECT * from UserSonic where Email=@Email and password=@Password";
+           return _userRepository.GetUsesr(email, password,sql);
+        }
+
 
         public List<Item> GetOperationDetailsByOperationId(int operationId)
         {
@@ -55,12 +62,12 @@ namespace Mini_Sonic_DAL.Repositories
             throw new NotImplementedException();
         }
 
-        OperationResult IGenericRepository<User>.Update(User entity)
+        Result IGenericRepository<User>.Update(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public OperationResult Add(Operation entity, string connectionString)
+        public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }

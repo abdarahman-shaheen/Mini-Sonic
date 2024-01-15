@@ -18,40 +18,40 @@ namespace Mini_Sonic.Service
             _categoryManager = new CategoryManager(categoryRepository);
         }
 
-        public OperationResult Add(Categoty entity)
+        public Result Add(Categoty entity)
         {
             var Result = _categoryManager.Add(entity);
             if (Result != null)
             {
                 // If operation was successful, return the entity
-                return  OperationResult.Success;
+                return  Result.Success;
             }
             else
             {
                 // If operation failed, you might want to handle it accordingly
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
 
     
-        public OperationResult Update(Categoty entity)
+        public Result Update(Categoty entity)
         {
             var Result = _categoryManager.Update(entity);
-            if (Result == OperationResult.Success)
+            if (Result == Result.Success)
             {
                 // If operation was successful, return the entity
-                return OperationResult.Success;
+                return Result.Success;
             }
             else
             {
                 // If operation failed, you might want to handle it accordingly
                 // For now, let's return null, but you can modify this based on your needs
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
-        public void Delete(int id)
+        public Result Delete(int id)
         {
-            _categoryManager.Delete(id);
+          return  _categoryManager.Delete(id);
         }
 
         public List<Categoty> GetAll()
@@ -63,13 +63,17 @@ namespace Mini_Sonic.Service
         {
             return _categoryManager.GetById(id);
         }
+        public List<Categoty> GetUserCategory(int userId)
+        {
+            return _categoryManager.GetAllByUser(userId);
+        }
 
         public List<Item> GetOperationDetailsByOperationId(int operationId)
         {
             throw new NotImplementedException();
         }
 
-        public OperationResult Add(Operation entity, string connectionString)
+        public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }

@@ -13,35 +13,46 @@ namespace Mini_Sonic.Controllers
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController : BaseController
     {
         private readonly CategoryService _categoryService;
+        protected readonly IConfiguration _configuration;
+        private readonly UserService _userService;
 
-        public CategoryController(IRepository<Categoty> categoryRepository)
+        public CategoryController(IRepository<Categoty> categoryRepository, UserService userService, IConfiguration configuration):base(configuration)
         {
             _categoryService = new CategoryService(categoryRepository);
+            _configuration = configuration;
+            _userService = userService;
         }
 
         [HttpGet]
         public IEnumerable<Categoty> Get()
         {
+            var user = _userService.GetUser(CurrentUser.Email, CurrentUser.Password);
+            Console.WriteLine(user);
             return _categoryService.GetAll();
+
+
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Categoty> Get(int id)
+        [HttpGet("current")]
+        public ActionResult<Categoty> GetCurrentUserCategory()
         {
-            var category = _categoryService.GetById(id);
+            var id = CurrentUser.Id;
+            var category = _categoryService.GetUserCategory(id);
+
             if (category == null)
             {
                 return NotFound();
             }
+
             return Ok(category);
         }
-
         [HttpPost]
         public ActionResult<Categoty> Post(Categoty category)
         {
+            category.userId = CurrentUser.Id;
             var newCategory = _categoryService.Add(category);
             return Ok( newCategory);
         }
@@ -52,7 +63,7 @@ namespace Mini_Sonic.Controllers
             try
             {
                 var updatedCategory = _categoryService.Update(category);
-                updatedCategory = (OperationResult)1;
+                updatedCategory = (Result)1;
                 return Ok(updatedCategory);
             }
             catch (Exception ex)

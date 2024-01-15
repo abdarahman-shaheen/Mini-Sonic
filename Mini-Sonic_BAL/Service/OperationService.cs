@@ -13,7 +13,7 @@ namespace Mini_Sonic.Service
     public class OperationService : IGenericRepository<Operation>
     {
         private readonly OperationManager _operationManager;
-        //private readonly string _connectionString = "Server=JO-SHAHEEN-PC\\SQLEXPRESS;Database=miniSonic;Integrated Security=SSPI;TrustServerCertificate=True";
+        private readonly string _connectionString = "Server=JO-SHAHEEN-PC\\SQLEXPRESS;Database=miniSonic;Integrated Security=SSPI;TrustServerCertificate=True";
 
         public OperationService(IRepository<Operation> operationRepository)
         {
@@ -25,71 +25,99 @@ namespace Mini_Sonic.Service
             return _operationManager.GetAll();
         }
 
-        public OperationResult Add(Operation entity)
+        public Result Add(Operation entity)
         {
-            try
-            {
-                _operationManager.Add(entity);
-                return OperationResult.Success;
-            }
-            catch
-            {
-                // Log or handle the exception as needed
-                return OperationResult.Fail;
-            }
-        }
-        public OperationResult Add(Operation entity, string connectionString)
-        {
-           
-                using (TransactionScope scope = new TransactionScope())
+             var dbManager = new DbManager(_connectionString);
+
+            Result operationResult = Result.Success;
+
+                try
                 {
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+                   
+                     dbManager.BeginTransaction();
+                      operationResult = _operationManager.Add(entity, dbManager);
+
+                    if (operationResult == Result.Success)
                     {
-                        connection.Open();
-
-                        using (SqlTransaction transaction = connection.BeginTransaction())
-                        {
-                            try
-                            {
-                                _operationManager.Add(entity, transaction);
-
-                                // If you have other repository calls, you can add them here with the same transaction
-
-                                transaction.Commit();
-                                scope.Complete();
-                                return OperationResult.Success;
-                            }
-                            catch (Exception ex)
-                            {
-                                transaction.Rollback();
-                                return OperationResult.Fail;
-                            }
-                        }
+                        operationResult = _operationManager.AddDetails(entity.Items, dbManager, entity.Id); ;
                     }
-                }
-            
-           
-   
-            
-        }
 
-        public OperationResult Update(Operation entity)
+                    if (operationResult == Result.Success)
+                    {
+
+                        dbManager.CommitTransaction();
+                    }
+                    
+
+                }
+                catch
+                {
+                   
+                    dbManager.RollbackTransaction();
+                return Result.Fail; 
+                }
+            finally
+            {
+                if(operationResult == Result.Fail)
+                {
+                    dbManager.RollbackTransaction();
+                }
+                
+            }
+               
+
+                return Result.Success;
+            }
+          
+        
+
+    //public OperationResult Add(Operation entity, string connectionString)
+    //{
+
+    //    using (TransactionScope scope = new TransactionScope())
+    //    {
+    //        using (SqlConnection connection = new SqlConnection(connectionString))
+    //        {
+    //            connection.Open();
+
+    //            using (SqlTransaction transaction = connection.BeginTransaction())
+    //            {
+    //                try
+    //                {
+    //                    _operationManager.Add(entity, transaction);
+
+    //                    // If you have other repository calls, you can add them here with the same transaction
+
+    //                    transaction.Commit();
+    //                    scope.Complete();
+    //                    return OperationResult.Success;
+    //                }
+    //                catch (Exception ex)
+    //                {
+    //                    transaction.Rollback();
+    //                    return OperationResult.Fail;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+    public Result Update(Operation entity)
         {
             try
             {
                 _operationManager.Update(entity);
-                return OperationResult.Success;
+                return Result.Success;
             }
             catch
             {
                 // Log or handle the exception as needed
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
 
-        public void Delete(int id)
+        public Result Delete(int id)
         {
-            _operationManager.Delete(id);
+            return _operationManager.Delete(id);
         }
 
         public Operation GetById(int id)

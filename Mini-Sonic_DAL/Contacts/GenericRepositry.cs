@@ -2,132 +2,143 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Mini_Sonic.Model;
+using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 
-namespace Mini_Sonic_DAL.Contacts
+public class GenericRepositry<T> : IRepository<T> where T : class
 {
-    public class GenericRepositry<T> : IRepository<T> where T : class
+    private readonly string _connectionString;
+
+    public GenericRepositry(IConfiguration configuration)
     {
-        private readonly string _connectionString;
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+    }
 
-        public GenericRepositry(IConfiguration _configuration)
+    public Result Add(T entity, string sql, ref int newId, DbManager dbManager)
+    {
+        var id = dbManager.ExecuteScalar<int>(sql, entity);
+        if (id != null)
         {
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            newId = id;
+            return Result.Success;
+        }
+        else
+        {
+            return Result.Fail;
+        }
+    }
+
+    public Result Add(string sql, DbManager dbManager)
+    {
+
+        var newId = dbManager.ExecuteScalar<int>(sql);
+        if (newId != null)
+        {
+
+            return Result.Success;
+        }
+        else
+        {
+            return Result.Fail;
         }
 
-        public T Add(T entity, string sql)
-        {
-            using (IDbConnection _connection = new SqlConnection(_connectionString))
-            {
-                var newId = _connection.ExecuteScalar<int>(sql, entity);
+    }
 
-                typeof(T).GetProperty("Id").SetValue(entity, newId);
-                return entity;
+    public T Add(T entity, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
 
+        var newId = dbManager.ExecuteScalar<int>(sql, entity);
 
-            }
-        }
+        typeof(T).GetProperty("Id").SetValue(entity, newId);
 
-        public OperationResult Update(T entity, string sql)
-        {
-            using (IDbConnection _connection = new SqlConnection(_connectionString))
-            {
-                _connection.Execute(sql, entity);
-                return OperationResult.Success;
-            }
-        }
+        return entity;
 
-        public void Delete(int id, string sql)
-        {
-            using (IDbConnection _connection = new SqlConnection(_connectionString))
-            {
-                _connection.Execute(sql, new { Id = id });
-            }
-        }
+    }
 
-        public List<T> GetAll(string sql)
-        {
-            using (IDbConnection _connection = new SqlConnection(_connectionString))
-            {
-                return _connection.Query<T>(sql).ToList();
-            }
-        }
+    public Result Update(T entity, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        dbManager.Execute(sql, entity);
+        return Result.Success;
+    }
 
-        public T GetById(int id, string sql)
-        {
-            using (IDbConnection _connection = new SqlConnection(_connectionString))
-            {
-                return _connection.QueryFirstOrDefault<T>(sql, new { Id = id });
-            }
-        }
+    public Result Delete(int id, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        dbManager.Execute(sql, new { Id = id });
+        return Result.Success;
+    }
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId, string sql)
-        {
-            List<Item> operationDetails = new List<Item>();
+    public List<T> GetAll(string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetList<T>(sql);
+    }
 
-            using (IDbConnection dbConnection = new SqlConnection(_connectionString))
-            {
-                operationDetails = dbConnection.Query<Item>(sql, new { OperationId = operationId }).ToList();
-            }
-
-            return operationDetails;
-        }
-        public OperationResult AddOperationWithDetails(List<OperationDetail> entitylistDetails, string sqlOperationDetails, int operationId)
-        {
-            using (IDbConnection Dbconnection = new SqlConnection(_connectionString))
-            {
-
-                foreach (var item in entitylistDetails)
-                {
-                    Dbconnection.Execute(sqlOperationDetails, new OperationDetail
-                    {
-                        Quantity = item.Quantity,
-                        ItemId = item.ItemId,
-                        OperationId = operationId
-                    });
-                }
-            }
-            return OperationResult.Success;
+    public T GetById(int id, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetSingle<T>(sql, new { Id = id });
+    }
 
 
-        }
-        public T Add(T entity, string sql, SqlTransaction transaction)
-        {
-            // Use the existing connection from the transaction
-           
-                var newId = transaction.Connection.ExecuteScalar<int>(sql, entity, transaction);
-               //_connection.ExecuteScalar<int>("SELECT CAST(SCOPE_IDENTITY() AS INT)", transaction);
-                typeof(T).GetProperty("Id").SetValue(entity, newId);
-                return entity;
-            
-        }
-   public OperationResult AddOperationWithDetails(List<OperationDetail> entitylistDetails, string sqlOperationDetails, int operationId, SqlTransaction transaction)
-{
-   
+    public List<Item> GetOperationDetailsByOperationId(int operationId, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetList<Item>(sql, new { OperationId = operationId });
+    }
+    public List<T> GetAllByUser(string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetList<T>(sql);
+    }
 
-            foreach (var item in entitylistDetails)
-            {
-                    transaction.Connection.Execute(sqlOperationDetails, new OperationDetail
-                {
-                    Quantity = item.Quantity,
-                    ItemId = item.ItemId,
-                    OperationId = operationId
-                }, transaction);
-            }
+    public T GetUsesr(string email, string password, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetSingle<T>(sql, new { Email = email, Password = password });
+    }
+
+
+    //public OperationResult AddOperationWithDetails(OperationDetail entityListDetails, string sqlOperationDetails, int operationId)
+    //{
+    //    var dbManager = new DbManager(_connectionString);
+       
+    //        dbManager.Execute(sqlOperationDetails, new OperationDetail
+    //        {
+    //            Quantity = entityListDetails.Quantity,
+    //            ItemId = entityListDetails.ItemId,
+    //            OperationId = operationId
+    //        });
         
+    //    return OperationResult.Success;
+    //}
 
-        return OperationResult.Success;
-    }
-    }
+   
+    //public OperationResult AddOperationWithDetails(List<OperationDetail> entityListDetails, string sqlOperationDetails, int operationId, SqlTransaction transaction)
+    //{
+    //    var dbManager = new DbManager(_connectionString);
+    //    dbManager.BeginTransaction();
+    //    foreach (var item in entityListDetails)
+    //    {
+    //        dbManager.Execute(sqlOperationDetails, new OperationDetail
+    //        {
+    //            Quantity = item.Quantity,
+    //            ItemId = item.ItemId,
+    //            OperationId = 1000
+    //        });
+    //    }
 
+    //    if (transaction != null)
+    //    {
+    //        transaction.Commit();
+    //    }
+
+    //    return OperationResult.Success;
+    //}
+
+   
+  
 }
-

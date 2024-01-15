@@ -18,25 +18,25 @@ namespace Mini_Sonic.Service
             _itemManager = new ItemManager(itemRepository);
         }
 
-        public OperationResult Add(Item entity)
+        public Result Add(Item entity)
         {
             var Result=   _itemManager.Add(entity);
-            if (Result == OperationResult.Success)
+            if (Result == Result.Success)
             {
                 // If operation was successful, return the entity
-                return OperationResult.Success;
+                return Result.Success;
             }
             else
             {
                 // If operation failed, you might want to handle it accordingly
                 // For now, let's return null, but you can modify this based on your needs
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
 
-        public void Delete(int id)
+        public Result Delete(int id)
         {
-            _itemManager.Delete(id);
+         return   _itemManager.Delete(id);
         }
 
         public List<Item> GetAll()
@@ -54,19 +54,19 @@ namespace Mini_Sonic.Service
             throw new NotImplementedException();
         }
 
-        public OperationResult Update(Item entity)
+        public Result Update(Item entity)
         {
             var Result = _itemManager.Update(entity);
-            if (Result == OperationResult.Success)
+            if (Result == Result.Success)
             {
                 // If operation was successful, return the entity
-                return OperationResult.Success;
+                return Result.Success;
             }
             else
             {
                 // If operation failed, you might want to handle it accordingly
                 // For now, let's return null, but you can modify this based on your needs
-                return OperationResult.Fail;
+                return Result.Fail;
             }
         }
     }

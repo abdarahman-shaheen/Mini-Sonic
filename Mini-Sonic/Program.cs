@@ -27,6 +27,8 @@ namespace Mini_Sonic
             //builder.Services.AddTransient<CategoryManager>();
             //builder.Services.AddTransient<CategoryService>();
             builder.Services.AddTransient(typeof(IRepository<>), typeof(GenericRepositry<>));
+            builder.Services.AddScoped<UserService>();
+
             //builder.Services.AddTransient<ItemService>();
             //builder.Services.AddTransient<ItemManager>();
 

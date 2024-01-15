@@ -22,12 +22,12 @@ namespace Mini_Sonic.Service
             return _userManager.GetAll();
         }
 
-        public OperationResult Add(User entity)
+        public Result Add(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(int id)
+        public Result Delete(int id)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +35,7 @@ namespace Mini_Sonic.Service
 
         public User GetById(int id)
         {
-            throw new NotImplementedException();
+          return  _userManager.GetById(id);
         }
 
         public List<Item> GetOperationDetailsByOperationId(int operationId)
@@ -43,12 +43,18 @@ namespace Mini_Sonic.Service
             throw new NotImplementedException();
         }
 
-        public OperationResult Update(User entity)
+        public User GetUser(string email, string password)
+        {
+            return _userManager.GetUser(email, password);
+
+        }
+  
+        public Result Update(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public OperationResult Add(Operation entity, string connectionString)
+        public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }

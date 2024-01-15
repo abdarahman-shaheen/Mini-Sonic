@@ -23,37 +23,42 @@ namespace Mini_Sonic_DAL.Repositories
         }
 
 
-        public OperationResult Add(Categoty entity)
+        public Result Add(Categoty entity)
         {
-            var sql = "INSERT INTO Categoty (CategoryName) VALUES (@CategoryName); SELECT CAST(SCOPE_IDENTITY() AS INT)";
+            var sql = "INSERT INTO Categoty (userId,CategoryName) VALUES (@userId,@CategoryName); SELECT CAST(SCOPE_IDENTITY() AS INT)";
             var newId = _categoryRepository.Add(entity, sql);
 
-            return newId != null ? OperationResult.Success : OperationResult.Fail;
+            return newId != null ? Result.Success : Result.Fail;
         }
 
-        public OperationResult Update(Categoty entity)
+        public Result Update(Categoty entity)
         {
             var sql = "UPDATE Categoty SET CategoryName = @CategoryName WHERE Id = @Id";
             _categoryRepository.Update(entity, sql);
 
-            return OperationResult.Success;
+            return Result.Success;
         }
-        public void Delete(int id)
+        public Result Delete(int id)
         {
             var sql = "DELETE FROM Categoty WHERE Id = @Id";
-            _categoryRepository.Delete(id, sql);
+           return _categoryRepository.Delete(id, sql);
         }
 
         public List<Categoty> GetAll()
         {
-            var sql = "SELECT * FROM Categoty";
+            var sql = "SELECT * FROM Categoty ";
             return _categoryRepository.GetAll(sql);
         }
 
         public Categoty GetById(int id)
         {
-            var sql = "SELECT * FROM Categoty WHERE Id = @Id";
+            var sql = "SELECT * FROM Categoty WHERE userID = @Id";
             return _categoryRepository.GetById(id, sql);
+        }
+        public List<Categoty> GetAllByUser(int userId)
+        {
+            var sql = $"SELECT * FROM Categoty WHERE userId = {userId}";
+            return _categoryRepository.GetAllByUser(sql);
         }
 
         public List<Item> GetOperationDetailsByOperationId(int operationId)
@@ -61,7 +66,7 @@ namespace Mini_Sonic_DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public OperationResult Add(Operation entity, string connectionString)
+        public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }

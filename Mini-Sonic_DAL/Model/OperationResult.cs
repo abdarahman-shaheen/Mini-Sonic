@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mini_Sonic_DAL.Model
 {
-    public enum OperationResult
+    public enum Result
     {
         Success = 1,
         Fail = 0

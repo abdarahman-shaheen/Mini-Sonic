@@ -7,7 +7,7 @@ using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using System;
 using System.Collections.Generic;
-[Authorize(Roles = "Admin")]
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ItemController : ControllerBase
@@ -41,7 +41,7 @@ public class ItemController : ControllerBase
     {
         var result = _itemService.Add(item);
 
-        if (result == OperationResult.Success)
+        if (result == Result.Success)
         {
             return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
         }
@@ -58,7 +58,7 @@ public class ItemController : ControllerBase
         {
             var result = _itemService.Update(item);
 
-            if (result == OperationResult.Success)
+            if (result == Result.Success)
             {
                 return Ok(item);
             }

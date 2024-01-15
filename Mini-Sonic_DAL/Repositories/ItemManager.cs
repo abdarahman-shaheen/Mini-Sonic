@@ -17,25 +17,25 @@ namespace Mini_Sonic_DAL.Repositories
         }
 
 
-        public OperationResult Add(Item entity)
+        public Result Add(Item entity)
         {
             string sql = @"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
                       VALUES(@Name, @Price, @Discount, @Tax, @CategoryId)" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
             var result = _itemRepository.Add(entity, sql);
 
-            return result != null ? OperationResult.Success : OperationResult.Fail;
+            return result != null ? Result.Success : Result.Fail;
         }
 
-        public OperationResult Add(Operation entity, string connectionString)
+        public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(int id)
+        public Result Delete(int id)
         {
             var sql = "DELETE FROM Item WHERE Id = @Id";
-            _itemRepository.Delete(id, sql);
+           return _itemRepository.Delete(id, sql);
         }
 
         public List<Item> GetAll()
@@ -56,14 +56,14 @@ namespace Mini_Sonic_DAL.Repositories
         }
 
 
-        public OperationResult Update(Item entity)
+        public Result Update(Item entity)
         {
             var sql = "UPDATE Item " +
                       "SET Name = @Name, Price = @Price, Discount = @Discount, Tax = @Tax, CategoryId = @CategoryId " +
                       "WHERE Id = @Id";
 
             _itemRepository.Update(entity, sql);
-            return OperationResult.Success;
+            return Result.Success;
         }
     }
 }
