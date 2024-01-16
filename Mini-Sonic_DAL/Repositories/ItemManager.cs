@@ -10,6 +10,7 @@ namespace Mini_Sonic_DAL.Repositories
     public class ItemManager : IGenericRepository<Item>
     {
         private readonly IRepository<Item> _itemRepository;
+        private readonly string _connectionString = "Server=JO-SHAHEEN-PC\\SQLEXPRESS;Database=miniSonic;Integrated Security=SSPI;TrustServerCertificate=True";
 
         public ItemManager(IRepository<Item> itemRepository)
         {
@@ -19,23 +20,34 @@ namespace Mini_Sonic_DAL.Repositories
 
         public Result Add(Item entity)
         {
-            string sql = @"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
-                      VALUES(@Name, @Price, @Discount, @Tax, @CategoryId)" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
+            var dbManager = new DbManager(_connectionString);
 
-            var result = _itemRepository.Add(entity, sql);
+            string sql = $@"INSERT INTO Item (Name, Price, Discount, Tax, CategoryId)
+                      VALUES('{entity.Name}', {entity.Price}, {entity.Discount}, {entity.Tax}, {entity.CategoryId})" + "SELECT CAST(SCOPE_IDENTITY() AS INT)";
+
+            var result = _itemRepository.Add(sql,dbManager);
 
             return result != null ? Result.Success : Result.Fail;
         }
 
-        public Result Add(Operation entity, string connectionString)
-        {
-            throw new NotImplementedException();
-        }
+   
 
         public Result Delete(int id)
         {
-            var sql = "DELETE FROM Item WHERE Id = @Id";
-           return _itemRepository.Delete(id, sql);
+            Result result = Result.Success;
+
+            try
+            {
+                var sql = "DELETE FROM Item WHERE Id = @Id";
+                result = _itemRepository.Delete(id, sql);
+                return result;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+          
         }
 
         public List<Item> GetAll()
@@ -47,13 +59,9 @@ namespace Mini_Sonic_DAL.Repositories
         public Item GetById(int id)
         {
             var sql = "SELECT * FROM Item WHERE Id = @Id";
-            return _itemRepository.GetById(id, sql);
+            return _itemRepository.GetSingle(id, sql);
         }
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId)
-        {
-            throw new NotImplementedException();
-        }
 
 
         public Result Update(Item entity)

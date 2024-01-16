@@ -1,12 +1,9 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
-using Mini_Sonic.Model;
+﻿using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
-using System.Data;
-using System.Data.Common;
-using System.Transactions;
+using System;
+using System.Collections.Generic;
 
 namespace Mini_Sonic.Service
 {
@@ -22,112 +19,108 @@ namespace Mini_Sonic.Service
 
         public List<Operation> GetAll()
         {
-            return _operationManager.GetAll();
+            try
+            {
+                return _operationManager.GetAll();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetAll method of OperationService: {ex.Message}");
+                return new List<Operation>();
+            }
         }
 
         public Result Add(Operation entity)
         {
-             var dbManager = new DbManager(_connectionString);
-
+            var dbManager = new DbManager(_connectionString);
             Result operationResult = Result.Success;
 
-                try
+            try
+            {
+                dbManager.BeginTransaction();
+                operationResult = _operationManager.Add(entity, dbManager);
+
+                if (operationResult == Result.Success)
                 {
-                   
-                     dbManager.BeginTransaction();
-                      operationResult = _operationManager.Add(entity, dbManager);
-
-                    if (operationResult == Result.Success)
-                    {
-                        operationResult = _operationManager.AddDetails(entity.Items, dbManager, entity.Id); ;
-                    }
-
-                    if (operationResult == Result.Success)
-                    {
-
-                        dbManager.CommitTransaction();
-                    }
-                    
-
+                    operationResult = _operationManager.AddDetails(entity.Items, dbManager, entity.Id);
                 }
-                catch
+
+                if (operationResult == Result.Success)
                 {
-                   
-                    dbManager.RollbackTransaction();
-                return Result.Fail; 
+                    dbManager.CommitTransaction();
                 }
+            }
+            catch (Exception ex)
+            {
+                dbManager.RollbackTransaction();
+                Console.Error.WriteLine($"An error occurred in the Add method of OperationService: {ex.Message}");
+                return Result.Fail;
+            }
             finally
             {
-                if(operationResult == Result.Fail)
+                if (operationResult == Result.Fail)
                 {
                     dbManager.RollbackTransaction();
                 }
-                
             }
-               
 
-                return Result.Success;
-            }
-          
-        
+            return Result.Success;
+        }
 
-    //public OperationResult Add(Operation entity, string connectionString)
-    //{
-
-    //    using (TransactionScope scope = new TransactionScope())
-    //    {
-    //        using (SqlConnection connection = new SqlConnection(connectionString))
-    //        {
-    //            connection.Open();
-
-    //            using (SqlTransaction transaction = connection.BeginTransaction())
-    //            {
-    //                try
-    //                {
-    //                    _operationManager.Add(entity, transaction);
-
-    //                    // If you have other repository calls, you can add them here with the same transaction
-
-    //                    transaction.Commit();
-    //                    scope.Complete();
-    //                    return OperationResult.Success;
-    //                }
-    //                catch (Exception ex)
-    //                {
-    //                    transaction.Rollback();
-    //                    return OperationResult.Fail;
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-    public Result Update(Operation entity)
+        public Result Update(Operation entity)
         {
             try
             {
                 _operationManager.Update(entity);
                 return Result.Success;
             }
-            catch
+            catch (Exception ex)
             {
-                // Log or handle the exception as needed
+                Console.Error.WriteLine($"An error occurred in the Update method of OperationService: {ex.Message}");
                 return Result.Fail;
             }
         }
 
         public Result Delete(int id)
         {
-            return _operationManager.Delete(id);
+            Result result = Result.Success;
+            try
+            {
+                result = _operationManager.Delete(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Delete method of OperationService: {ex.Message}");
+                result = Result.Fail;
+                return result;
+            }
         }
 
         public Operation GetById(int id)
         {
-            return _operationManager.GetById(id);
+            try
+            {
+                return _operationManager.GetById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetById method of OperationService: {ex.Message}");
+                return null;
+            }
         }
 
         public List<Item> GetOperationDetailsByOperationId(int operationId)
         {
-            return _operationManager.GetOperationDetailsByOperationId(operationId);
+            try
+            {
+                return _operationManager.GetOperationDetailsByOperationId(operationId);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetOperationDetailsByOperationId method of OperationService: {ex.Message}");
+                return new List<Item>();
+            }
         }
     }
 }

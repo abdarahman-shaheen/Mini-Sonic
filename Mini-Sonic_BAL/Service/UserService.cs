@@ -4,6 +4,8 @@ using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
+using System;
+using System.Collections.Generic;
 using System.Data;
 
 namespace Mini_Sonic.Service
@@ -19,44 +21,94 @@ namespace Mini_Sonic.Service
 
         public List<User> GetAll()
         {
-            return _userManager.GetAll();
+            Result result = Result.Success;
+            try
+            {
+                return _userManager.GetAll();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetAll method of UserService: {ex.Message}");
+                result = Result.Fail;
+                return new List<User>();
+            }
         }
 
         public Result Add(User entity)
         {
-            throw new NotImplementedException();
+            Result result = Result.Success;
+            try
+            {
+            
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Add method of UserService: {ex.Message}");
+                return Result.Fail;
+            }
         }
 
         public Result Delete(int id)
         {
-            throw new NotImplementedException();
+            Result result = Result.Success;
+            try
+            {
+         
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Delete method of UserService: {ex.Message}");
+                return Result.Fail;
+            }
         }
-
 
         public User GetById(int id)
         {
-          return  _userManager.GetById(id);
+            Result result = Result.Success;
+            try
+            {
+                return _userManager.GetById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetById method of UserService: {ex.Message}");
+                result = Result.Fail;
+                return null;
+            }
         }
-
-        public List<Item> GetOperationDetailsByOperationId(int operationId)
-        {
-            throw new NotImplementedException();
-        }
-
         public User GetUser(string email, string password)
         {
-            return _userManager.GetUser(email, password);
-
+            Result result = Result.Success;
+            try
+            {
+                return _userManager.GetUser(email, password);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetUser method of UserService: {ex.Message}");
+                result = Result.Fail;
+                return null;
+            }
         }
-  
+
         public Result Update(User entity)
         {
-            throw new NotImplementedException();
+            Result result = Result.Success;
+            try
+            {
+            
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Update method of UserService: {ex.Message}");
+                return Result.Fail;
+            }
         }
 
-        public Result Add(Operation entity, string connectionString)
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }

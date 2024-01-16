@@ -1,16 +1,14 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Mini_Sonic.Model;
+﻿using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
-using System.Data;
+using System;
+using System.Collections.Generic;
+
 namespace Mini_Sonic.Service
 {
-    public class ItemService  :IGenericRepository<Item>
+    public class ItemService : IGenericRepository<Item>
     {
-
         private readonly ItemManager _itemManager;
 
         public ItemService(IRepository<Item> itemRepository)
@@ -20,53 +18,89 @@ namespace Mini_Sonic.Service
 
         public Result Add(Item entity)
         {
-            var Result=   _itemManager.Add(entity);
-            if (Result == Result.Success)
+            Result result = Result.Success;
+            try
             {
-                // If operation was successful, return the entity
-                return Result.Success;
+                result = _itemManager.Add(entity);
+                if (result == Result.Success)
+                {
+                    return Result.Success;
+                }
+                else
+                {
+                    return Result.Fail;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // If operation failed, you might want to handle it accordingly
-                // For now, let's return null, but you can modify this based on your needs
-                return Result.Fail;
+                Console.Error.WriteLine($"An error occurred in the Add method of ItemService: {ex.Message}");
+                return result;
             }
         }
 
         public Result Delete(int id)
         {
-         return   _itemManager.Delete(id);
+            Result result = Result.Success;
+
+            try
+            {
+                result = _itemManager.Delete(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Delete method of ItemService: {ex.Message}");
+                result = Result.Fail;
+                return result;
+            }
         }
 
         public List<Item> GetAll()
         {
-            return _itemManager.GetAll();
+            try
+            {
+                return _itemManager.GetAll();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetAll method of ItemService: {ex.Message}");
+                return new List<Item>();
+            }
         }
 
         public Item GetById(int id)
         {
-            return _itemManager.GetById(id);
+            try
+            {
+                return _itemManager.GetById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetById method of ItemService: {ex.Message}");
+                return null;
+            }
         }
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId)
-        {
-            throw new NotImplementedException();
-        }
 
         public Result Update(Item entity)
         {
-            var Result = _itemManager.Update(entity);
-            if (Result == Result.Success)
+            Result result = Result.Success;
+            try
             {
-                // If operation was successful, return the entity
-                return Result.Success;
+                result = _itemManager.Update(entity);
+                if (result == Result.Success)
+                {
+                    return Result.Success;
+                }
+                else
+                {
+                    return Result.Fail;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // If operation failed, you might want to handle it accordingly
-                // For now, let's return null, but you can modify this based on your needs
-                return Result.Fail;
+                Console.Error.WriteLine($"An error occurred in the Update method of ItemService: {ex.Message}");
+                return result;
             }
         }
     }

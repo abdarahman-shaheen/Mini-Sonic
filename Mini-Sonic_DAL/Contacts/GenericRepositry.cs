@@ -14,7 +14,16 @@ public class GenericRepositry<T> : IRepository<T> where T : class
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
+    public List<T> GetAll(string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetList<T>(sql);
+    }
+    public T GetSingle(int id, string sql)
+    {
+        var dbManager = new DbManager(_connectionString);
+        return dbManager.GetSingle<T>(sql, new { Id = id });
+    }
     public Result Add(T entity, string sql, ref int newId, DbManager dbManager)
     {
         var id = dbManager.ExecuteScalar<int>(sql, entity);
@@ -28,7 +37,7 @@ public class GenericRepositry<T> : IRepository<T> where T : class
             return Result.Fail;
         }
     }
-
+  
     public Result Add(string sql, DbManager dbManager)
     {
 
@@ -42,18 +51,6 @@ public class GenericRepositry<T> : IRepository<T> where T : class
         {
             return Result.Fail;
         }
-
-    }
-
-    public T Add(T entity, string sql)
-    {
-        var dbManager = new DbManager(_connectionString);
-
-        var newId = dbManager.ExecuteScalar<int>(sql, entity);
-
-        typeof(T).GetProperty("Id").SetValue(entity, newId);
-
-        return entity;
 
     }
 
@@ -71,17 +68,9 @@ public class GenericRepositry<T> : IRepository<T> where T : class
         return Result.Success;
     }
 
-    public List<T> GetAll(string sql)
-    {
-        var dbManager = new DbManager(_connectionString);
-        return dbManager.GetList<T>(sql);
-    }
+ 
 
-    public T GetById(int id, string sql)
-    {
-        var dbManager = new DbManager(_connectionString);
-        return dbManager.GetSingle<T>(sql, new { Id = id });
-    }
+
 
 
     public List<Item> GetOperationDetailsByOperationId(int operationId, string sql)
@@ -102,43 +91,6 @@ public class GenericRepositry<T> : IRepository<T> where T : class
     }
 
 
-    //public OperationResult AddOperationWithDetails(OperationDetail entityListDetails, string sqlOperationDetails, int operationId)
-    //{
-    //    var dbManager = new DbManager(_connectionString);
-       
-    //        dbManager.Execute(sqlOperationDetails, new OperationDetail
-    //        {
-    //            Quantity = entityListDetails.Quantity,
-    //            ItemId = entityListDetails.ItemId,
-    //            OperationId = operationId
-    //        });
-        
-    //    return OperationResult.Success;
-    //}
 
-   
-    //public OperationResult AddOperationWithDetails(List<OperationDetail> entityListDetails, string sqlOperationDetails, int operationId, SqlTransaction transaction)
-    //{
-    //    var dbManager = new DbManager(_connectionString);
-    //    dbManager.BeginTransaction();
-    //    foreach (var item in entityListDetails)
-    //    {
-    //        dbManager.Execute(sqlOperationDetails, new OperationDetail
-    //        {
-    //            Quantity = item.Quantity,
-    //            ItemId = item.ItemId,
-    //            OperationId = 1000
-    //        });
-    //    }
-
-    //    if (transaction != null)
-    //    {
-    //        transaction.Commit();
-    //    }
-
-    //    return OperationResult.Success;
-    //}
-
-   
   
 }

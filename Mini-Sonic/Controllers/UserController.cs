@@ -91,7 +91,6 @@ namespace Mini_Sonic.Controllers
             new Claim("User", userJson, ClaimValueTypes.String) ,
              new Claim(ClaimTypes.Role, user.Role) 
 
-            // Custom claim "User" stores the serialized user objectQ
         }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -122,7 +121,6 @@ namespace Mini_Sonic.Controllers
             }
             catch (Exception ex)
             {
-                // Token validation failed
                 return null;
             }
 
@@ -135,18 +133,9 @@ namespace Mini_Sonic.Controllers
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                //if (string.IsNullOrEmpty(token))
-                //{
-                //    return BadRequest(new { error = "Authorization token is missing." });
-                //}
 
-               var user = DecodeJwtToken(token);
+                var user = DecodeJwtToken(token);
 
-                //if (user == null)
-                //{
-                //    return Unauthorized(new { error = "Invalid or expired token." });
-                //}
-             
 
                 return Ok(user);
             }
@@ -155,19 +144,6 @@ namespace Mini_Sonic.Controllers
                 return HandleException(ex);
             }
         }
-
-
-
-        // PUT api/<UserController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
     }
 }

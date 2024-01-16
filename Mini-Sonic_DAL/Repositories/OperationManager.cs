@@ -11,13 +11,9 @@ namespace Mini_Sonic_DAL.Repositories
 {
     public class OperationManager : IGenericRepository<Operation>
     {
-        private readonly string _connectionString;
         private readonly IRepository<Operation> _operationRepository;
 
-        //public OperationManager(IConfiguration configuration)
-        //{
-        //    _connectionString = configuration.GetConnectionString("DefaultConnection");
-        //}
+
 
 
         public OperationManager(IRepository<Operation> operationRepository)
@@ -74,15 +70,19 @@ namespace Mini_Sonic_DAL.Repositories
 
         public Result Delete(int id)
         {
+            Result result = Result.Success;
+
             try
             {
                 var sql = "DELETE FROM Operation WHERE Id = @Id";
-                _operationRepository.Delete(id, sql);
-                return Result.Success;
+                result = _operationRepository.Delete(id, sql);
+                return result;
             }
-            catch
+            catch(Exception ex) 
             {
-                return Result.Fail;
+                Console.Error.WriteLine($"An error occurred in the Delete method of CategoryManager: {ex.Message}");
+                result = Result.Fail;
+                return result;
             }
         }
 
@@ -104,7 +104,7 @@ namespace Mini_Sonic_DAL.Repositories
             try
             {
                 var sql = "SELECT * FROM Operation WHERE Id = @Id";
-                return _operationRepository.GetById(id, sql);
+                return _operationRepository.GetSingle(id, sql);
             }
             catch
             {

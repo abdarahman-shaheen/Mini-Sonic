@@ -43,7 +43,7 @@ namespace Mini_Sonic_DAL.Repositories
         public User GetById(int id)
         {
             var sql = "SELECT * from UserSonic where Id=@Id";
-            return _userRepository.GetById(id, sql);
+            return _userRepository.GetSingle(id, sql);
         }
         public User GetUser(string email,string password)
         {
@@ -52,21 +52,11 @@ namespace Mini_Sonic_DAL.Repositories
         }
 
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId)
+
+        public Result Update(User entity)
         {
             throw new NotImplementedException();
         }
-
-        public User Update(User entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        Result IGenericRepository<User>.Update(User entity)
-        {
-            throw new NotImplementedException();
-        }
-
         public Result Add(Operation entity, string connectionString)
         {
             throw new NotImplementedException();

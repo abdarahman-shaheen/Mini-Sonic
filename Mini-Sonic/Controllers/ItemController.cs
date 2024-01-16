@@ -7,47 +7,65 @@ using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class ItemController : ControllerBase
+public class ItemController : BaseController
 {
     private readonly ItemService _itemService;
-
-    public ItemController(IRepository<Item> itemRepository)
+    protected readonly IConfiguration _configuration;
+    public ItemController(IRepository<Item> itemRepository,IConfiguration configuration) : base(configuration)
     {
         _itemService = new ItemService(itemRepository);
-    }
+}
 
     [HttpGet]
-    public IEnumerable<Item> Get()
+    public ActionResult<IEnumerable<Item>> Get()
     {
-        return _itemService.GetAll();
+        try
+        {
+            var operation = _itemService.GetAll();
+            return Ok(operation);
+        }
+
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+        }
+       
     }
 
     [HttpGet("{id}")]
     public ActionResult<Item> Get(int id)
     {
-        var item = _itemService.GetById(id);
-        if (item == null)
+        try
         {
-            return NotFound();
+            var item = _itemService.GetById(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(item);
         }
-        return Ok(item);
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+        }
     }
 
     [HttpPost]
     public ActionResult<Item> Post(Item item)
     {
-        var result = _itemService.Add(item);
+        try
+        {
+            var result = _itemService.Add(item);
 
-        if (result == Result.Success)
-        {
-            return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
+           return Ok(result);
         }
-        else
+        catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Internal server error", error = "Failed to add item" });
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
         }
     }
 

@@ -17,25 +17,20 @@ namespace Mini_Sonic_DAL.Contacts
         Result Update(T entity);
         Result Delete(int id);
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId);
-
+    
     }
     public interface IRepository<T> where T : class
     {
-        T GetById(int id, string sql);
-        T GetUsesr(string email,string password, string sql);
-
-        List<T> GetAllByUser(string sql);
+        T GetSingle(int id, string sql);
         List<T> GetAll(string sql);
-        T Add(T entity, string sql);
         Result Add(T entity, string sql, ref int id, DbManager dbManager);
-        Result Add(string sql, DbManager transaction);
+        Result Add(string sql, DbManager transaction=null);
         Result Update(T entity, string sql);
         Result Delete(int id, string sql);
         List<Item> GetOperationDetailsByOperationId(int operationId, string sql);
-        //public OperationResult AddOperationWithDetails(OperationDetail entity, string sqlOperation, int operationId);
-        //OperationResult AddOperationWithDetails(List<OperationDetail> entitylistDetails, string sqlOperationDetails, int operationId, SqlTransaction transaction);
-
+        T GetUsesr(string email,string password, string sql);
+        List<T> GetAllByUser(string sql);
+      
 
     }
 }

@@ -4,9 +4,7 @@ using Mini_Sonic.Model;
 using Mini_Sonic.Service;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
-using System.Reflection.Metadata.Ecma335;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mini_Sonic.Controllers
 {
@@ -27,11 +25,19 @@ namespace Mini_Sonic.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Categoty> Get()
+        public ActionResult<IEnumerable<Categoty>> Get()
         {
-            var user = _userService.GetUser(CurrentUser.Email, CurrentUser.Password);
-            Console.WriteLine(user);
-            return _categoryService.GetAll();
+            try
+            {
+                var user = _userService.GetUser(CurrentUser.Email, CurrentUser.Password);
+                Console.WriteLine(user);
+                var categories = _categoryService.GetAll();
+                return Ok( categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
 
 
         }
@@ -39,22 +45,33 @@ namespace Mini_Sonic.Controllers
         [HttpGet("current")]
         public ActionResult<Categoty> GetCurrentUserCategory()
         {
-            var id = CurrentUser.Id;
-            var category = _categoryService.GetUserCategory(id);
-
-            if (category == null)
+            try
             {
-                return NotFound();
+                var id = CurrentUser.Id;
+                var category = _categoryService.GetUserCategory(id);
+
+
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
 
-            return Ok(category);
         }
         [HttpPost]
         public ActionResult<Categoty> Post(Categoty category)
         {
-            category.userId = CurrentUser.Id;
-            var newCategory = _categoryService.Add(category);
-            return Ok( newCategory);
+            try
+            {
+                category.userId = CurrentUser.Id;
+                var newCategory = _categoryService.Add(category);
+                return Ok(newCategory);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
         }
 
         [HttpPut]

@@ -1,11 +1,9 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
-using Mini_Sonic.Model;
+﻿using Mini_Sonic.Model;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
 using Mini_Sonic_DAL.Repositories;
-using System.Data;
-using System.Data.Common;
+using System;
+using System.Collections.Generic;
 
 namespace Mini_Sonic.Service
 {
@@ -20,63 +18,92 @@ namespace Mini_Sonic.Service
 
         public Result Add(Categoty entity)
         {
-            var Result = _categoryManager.Add(entity);
-            if (Result != null)
+            Result result = Result.Success;
+            try
             {
-                // If operation was successful, return the entity
-                return  Result.Success;
+                result = _categoryManager.Add(entity);
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                // If operation failed, you might want to handle it accordingly
-                return Result.Fail;
+                Console.Error.WriteLine($"An error occurred in the Add method of CategoryService: {ex.Message}");
+                return result;
             }
         }
 
-    
         public Result Update(Categoty entity)
         {
-            var Result = _categoryManager.Update(entity);
-            if (Result == Result.Success)
+            Result result = Result.Success;
+            try
             {
-                // If operation was successful, return the entity
-                return Result.Success;
+                result = _categoryManager.Update(entity);
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                // If operation failed, you might want to handle it accordingly
-                // For now, let's return null, but you can modify this based on your needs
-                return Result.Fail;
+                Console.Error.WriteLine($"An error occurred in the Update method of CategoryService: {ex.Message}");
+                return result;
             }
         }
+
         public Result Delete(int id)
         {
-          return  _categoryManager.Delete(id);
+            Result result = Result.Success;
+
+            try
+            {
+                result = _categoryManager.Delete(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the Delete method of CategoryService: {ex.Message}");
+                result = Result.Fail;
+                return result;
+            }
         }
 
         public List<Categoty> GetAll()
         {
-            return _categoryManager.GetAll();
+            try
+            {
+                return _categoryManager.GetAll();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetAll method of CategoryService: {ex.Message}");
+                return new List<Categoty>();
+            }
         }
 
         public Categoty GetById(int id)
         {
-            return _categoryManager.GetById(id);
+            try
+            {
+                return _categoryManager.GetById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetById method of CategoryService: {ex.Message}");
+                return null;
+            }
         }
+
         public List<Categoty> GetUserCategory(int userId)
         {
-            return _categoryManager.GetAllByUser(userId);
+            try
+            {
+                return _categoryManager.GetAllByUser(userId);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred in the GetUserCategory method of CategoryService: {ex.Message}");
+                return new List<Categoty>();
+            }
         }
 
-        public List<Item> GetOperationDetailsByOperationId(int operationId)
-        {
-            throw new NotImplementedException();
-        }
+    
 
-        public Result Add(Operation entity, string connectionString)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
-

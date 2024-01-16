@@ -18,7 +18,6 @@ public class BaseController : Controller
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        //base.OnActionExecuting(context);
 
         try
         {
@@ -38,15 +37,12 @@ public class BaseController : Controller
                 return;
             }
 
-            // Optionally, you can check if the user has the required role.
-            // For example, you can check if the user has an "Admin" role:
-          
+
 
             CurrentUser = (User)user;
         }
         catch (Exception ex)
         {
-            // Log the exception or handle it accordingly
             throw new Exception("error");
         }
     }
@@ -72,7 +68,6 @@ public class BaseController : Controller
         }
         catch (Exception ex)
         {
-            // Token validation failed
             return null;
         }
     }

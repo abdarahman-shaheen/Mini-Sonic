@@ -4,6 +4,7 @@ using Mini_Sonic.Model;
 using Mini_Sonic.Service;
 using Mini_Sonic_DAL.Contacts;
 using Mini_Sonic_DAL.Model;
+using System.Configuration;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,23 +13,32 @@ namespace Mini_Sonic.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class OperationController : ControllerBase
+    public class OperationController :BaseController
     {
 
 
         private readonly OperationService _operationService;
-        private readonly string _connectionString = "Server=JO-SHAHEEN-PC\\SQLEXPRESS;Database=miniSonic;Integrated Security=SSPI;TrustServerCertificate=True";
-
-        public OperationController(IRepository<Operation> operationRepository)
+        protected readonly IConfiguration _configuration;
+        public OperationController(IRepository<Operation> operationRepository,IConfiguration configuration) : base(configuration)
         {
             _operationService = new OperationService(operationRepository);
            
         }
 
         [HttpGet]
-        public IEnumerable<Operation> Get()
+        public ActionResult<IEnumerable<Operation>> Get()
         {
-            return _operationService.GetAll();
+            try
+            {
+                var operation = _operationService.GetAll();
+                return Ok(operation);
+            }
+
+            catch (Exception ex)
+            {
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+
         }
 
         [HttpGet("details/{operationId}")]
