@@ -1,6 +1,6 @@
 ## Sonic Mini
 -This is backend Api I used  a .Net API with JWT Authentication and I applied the three-tier architecture with the generic repository, Also I used dapper ORM to connect with the database.
-- frontend side [Mini Sonic](https://github.com/abdarahman-shaheen/Sonic-mini) (I used Angular )
+- frontend side [Mini Sonic](https://github.com/abdarahman-shaheen/Sonic-mini) (I used Angular framework )
 ## ERD
 ![Project ERD Image](ERD-Mini-Soni.jpg)
 
